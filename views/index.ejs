@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NodeJs Wikipedia API</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h2 align="center"> Web Application to use Wikipedia API to access wikipedia Details </h2>
+    <hr/>
+    <form method="post" action="" id="search">
+      Enter the title that you want to search
+      <input type="text" name="title" id="title"/>
+      <br/>
+      Enter the limit for wikipedia search result
+      <input type="text" name="limit" id="limit"/>
+      <br/>
+      <input type="submit" value="Search"/>  
+    </form>
+    <h2 align="center">Results of wikipedia Search</h2>
+    <hr/>
+    <table id="searchResult" name="searchResult" border="1">
+      <tr>
+        <td id="name" class="name">Name</td>
+        <td id="brief">Brief Details</td>
+        <td id="link">Link of wikipedia Page</td>
+      </tr>
+      <br/><br/>
+    </table>
+    <h2 align="center">Details of <span id="topic_name"></span> are here from Wikipedia</h2>
+    <hr>
+    <div width="500" height="400">
+      <span id="image"><img src="" id="profile_pic" width="400" height="350"/></span>
+      <span id="summary"> </span>
+      
+    </div>
+  </body>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js">
+  </script>
+  <script type='text/javascript'>
+    $(document).ready(function(){
+      $('#search').submit(function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: '/users',
+            data: $(this).serialize(),
+            error: function(e) {
+              console.log(e);
+              
+            },
+            success: function(data) {
+              data[1].forEach(function(item) {
+                  console.log();
+                  $("#name").append("<tr><td><a href='#' data-id='"+item+"'>"+item+"</a></td></tr>");
+              
+              });
+              data[2].forEach(function(item) {
+                if(item === "") {
+                  item = "No details available for this";
+                }
+                  $("#brief").append("<tr><td>"+item+"</td></tr>");
+              
+              });
+              data[3].forEach(function(item) {
+                  $("#link").append("<tr><td>"+item+"</td></tr>");
+              
+              });
+
+            }
+          });
+      });
+
+      $("#name").on( "click",'a', function() {
+        var title = $(this).attr( "data-id" );
+        $.ajax({
+            type: 'POST',
+            url: '/getDetails',
+            data: {"title":title},
+            error: function(e) {
+              console.log(e);
+              
+            },
+            success: function(data) {
+              console.log("data value " + data.summary);
+              $("#topic_name").html(data.name);
+              $("#summary").html(data.summary);
+              $('#profile_pic').attr("src",data.image);
+            }
+          });
+        
+      });
+
+    });
+    </script>     
+</html>
